@@ -1,58 +1,61 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
+import React, { useEffect, useState } from 'react';
 import './App.css';
+import styled, { ThemeProvider } from 'styled-components';
+import WebFont from 'webfontloader';
+import { GlobalStyles } from './theme/GlobalStyles';
+import { useTheme } from './theme/useTheme';
+import ThemeSelector from './ThemeSelector';
+
+// 2: Create a cotainer
+const Container = styled.div`
+  margin: auto;
+  /* margin: 5px auto 5px auto; */
+`;
 
 function App() {
+  // 3: Get the selected theme, font list, etc.
+  const { theme, themeLoaded, getFonts } = useTheme();
+  const [selectedTheme, setSelectedTheme] = useState(theme);
+
+  useEffect(() => {
+    setSelectedTheme(theme);
+  }, [theme]);
+
+  // 4: Load all the fonts
+  useEffect(() => {
+    WebFont.load({
+      google: {
+        families: getFonts(),
+      },
+    });
+  });
+
+  // 5: Render if the theme is loaded.
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
-    </div>
+    <>
+      {themeLoaded && (
+        <ThemeProvider theme={selectedTheme}>
+          <GlobalStyles />
+          <Container style={{ fontFamily: selectedTheme.font }}>
+            <Wrapper>
+              <ThemeSelector setter={setSelectedTheme} />
+              {/* <Calculator theme={theme} /> */}
+            </Wrapper>
+          </Container>
+        </ThemeProvider>
+      )}
+    </>
   );
 }
 
 export default App;
+
+const Wrapper = styled.div`
+  /* background-color: #3a4663; */
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
